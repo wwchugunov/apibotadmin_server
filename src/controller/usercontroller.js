@@ -22,10 +22,11 @@ class UserController {
       if (candidate) {
         return res.status(400).json({ message: "Пользователь уже зарегистрирован!" });
       }
-      let finalRole = 'user'; 
+      let finalRole = 'admin'; 
+      // админка
       if (role) {
         const currentUserRole = req.user?.role; 
-        if (currentUserRole === 'admin') {
+        if (currentUserRole === 'user') {
           finalRole = role; 
         } else {
           return res.status(403).json({ message: "Нет доступа для создания пользователя" });
@@ -34,7 +35,7 @@ class UserController {
       const hashPassword = await bcrypt.hash(password, 5);
       const createdUser = await User.create({ login, password: hashPassword, role: finalRole });
       const token = generateJwt(createdUser.id, createdUser.login, createdUser.role);
-      return res.status(201).json({ token });
+      return res.status(201).json({ token});
     } catch (error) {
       console.error("Registration error:", error);
       next(error);
@@ -56,7 +57,7 @@ class UserController {
         return res.status(401).json({ message: "Неверный пароль" });
       }
       const token = generateJwt(foundUser.id, foundUser.login, foundUser.role);
-      return res.status(200).json({ token, role: foundUser.role });
+      return res.status(200).json({ token, role: foundUser.role , id: foundUser.id});
     } catch (error) {
       console.error("Login error:", error);
       res.status(500).json({ message: "Login error", error });

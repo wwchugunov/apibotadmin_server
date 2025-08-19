@@ -1,6 +1,6 @@
 const TelegramBot = require("node-telegram-bot-api");
 const axios = require("axios");
-const token = process.env.BOT_TOKEN_PROD
+const token = process.env.BOT_TOKEN
 const bot = new TelegramBot(token, { polling: true });
 const url = process.env.BOT_URL_REG_USER;
 const userState = {};

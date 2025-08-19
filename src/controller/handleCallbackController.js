@@ -18,7 +18,7 @@ const handleCallback = async (req, res) => {
     console.log(`Found ${users.length} users with terminal: ${merchant}`);
 
     if (users.length > 0) {
-      const token =  process.env.BOT_TOKEN_PROD;
+      const token =  process.env.BOT_TOKEN;
       const url = `https://api.telegram.org/bot${token}/sendMessage`;
 
       // Format massages for users 

@@ -1,7 +1,8 @@
-
 const db = require("../model/model");
 
 class UserbotController {
+
+  
   async getAllUserbots(req, res) {
     try {
       const userbots = await db.userbot.findAll();
@@ -35,7 +36,6 @@ class UserbotController {
       res.status(404).send("Not found");
     }
   }
-
 
   async deleteUserbot(req, res) {
     try {
@@ -95,80 +95,47 @@ class UserbotController {
     return res.send("готово");
   }
 
-  async findTerminalByKey(req, res) {
-    const { key, value } = req.query;
-    try {
-      const result = await db.sequelize.query(
-        `
-        SELECT *
-        FROM "userbot"
-        WHERE jsonb_array_elements_text(terminals->'${key}') LIKE '%${value}%'
-      `,
-        { type: db.Sequelize.QueryTypes.SELECT }
-      );
-
-      if (result.length > 0) {
-        res.json(result);
-      } else {
-        res.send("No matching records found");
-      }
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Server error");
-    }
-  }
-
-  
   async editUserbot(req, res) {
     try {
       const { id } = req.params;
       const updateData = req.body;
-
       const [updated] = await db.userbot.update(updateData, {
         where: { id: id },
       });
-
       if (updated) {
         const updatedUserbot = await db.userbot.findOne({ where: { id: id } });
-        res
-          .status(200)
-          .json({
-            message: "Userbot updated successfully",
-            userbot: updatedUserbot,
-          });
+        res.status(200).json({
+          message: "Userbot updated successfully",
+          userbot: updatedUserbot,
+        });
       } else {
         res.status(404).json({ message: "Userbot not found" });
       }
     } catch (error) {
       console.error("Error updating userbot:", error);
-      res
-        .status(500)
-        .json({
-          message: "An error occurred while updating the userbot",
-          error: error.message,
-        });
+      res.status(500).json({
+        message: "An error occurred while updating the userbot",
+        error: error.message,
+      });
     }
   }
 
+  async getMerchant(req, res) {
+    const { id } = req.params;
 
-async getMerchant(req, res) {
-  const { id } = req.params;
-
-  try {
+    try {
       const foundUserbot = await db.userbot.findByPk(id);
 
       if (!foundUserbot) {
-          return res.status(404).json({ message: 'Userbot not found' });
+        return res.status(404).json({ message: "Userbot not found" });
       }
 
       res.status(200).json(foundUserbot);
-  } catch (error) {
+    } catch (error) {
       console.error(error);
-      res.status(500).json({ message: 'Internal Server Error' });
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   }
 }
 
-}
-
 module.exports = new UserbotController();
-
