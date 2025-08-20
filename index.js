@@ -6,8 +6,8 @@ const cors = require('cors');
 const http = require('http');
 const ErrorHandlingMiddleware = require('./src/middleware/ErrorHandlingMiddleware');
 const host = process.env.HOST
-// const telegrambot = require('./telegram');
 const port = process.env.PORT || 5000;
+// const telegrambot = require('./telegram');
 const app = express();
 app.use(cors());
 

@@ -25,7 +25,7 @@ const handleCallback = async (req, res) => {
       let message = `<b>Операція по торговцю:</b> ${merchant}\n`;
 
       if (messageData.respDesc === "Successful") {
-        message += `<b>Статус:</b> <b>Успішна ✅</b>\n`;
+        message += `<b>Статус:</b> <b>Успішно ✅</b>\n`;
       } else if (messageData.respDesc === "declined") {
         message += `<b>Статус:</b> <b>Відхилена ❌</b>\n`;
       } else if (messageData.respDesc === "processing") {

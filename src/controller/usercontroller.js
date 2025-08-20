@@ -22,22 +22,22 @@ class UserController {
       if (candidate) {
         return res.status(400).json({ message: "Пользователь уже зарегистрирован!" });
       }
-      let finalRole = 'admin'; 
-      // админка
-      if (role) {
-        const currentUserRole = req.user?.role; 
-        if (currentUserRole === 'user') {
-          finalRole = role; 
-        } else {
-          return res.status(403).json({ message: "Нет доступа для создания пользователя" });
-        }
-      }  // создание админа
+
+      // if (role && req.user?.role !== "admin") {
+      //   return res.status(403).json({ message: "Нет доступа для создания пользователя" });
+      // }. 
+      // Починить !
+
+
+      const finalRole = role || 'user';
+      
+      
       const hashPassword = await bcrypt.hash(password, 5);
       const createdUser = await User.create({ login, password: hashPassword, role: finalRole });
       const token = generateJwt(createdUser.id, createdUser.login, createdUser.role);
       return res.status(201).json({ token});
     } catch (error) {
-      console.error("Registration error:", error);
+      console.error("Ошибка регистрации", error);
       next(error);
     }
   }
@@ -59,8 +59,8 @@ class UserController {
       const token = generateJwt(foundUser.id, foundUser.login, foundUser.role);
       return res.status(200).json({ token, role: foundUser.role , id: foundUser.id});
     } catch (error) {
-      console.error("Login error:", error);
-      res.status(500).json({ message: "Login error", error });
+      console.error("Ошибка входа:", error);
+      res.status(500).json({ message: "Серверная ошибка", error });
     }
   }
 
@@ -69,8 +69,8 @@ class UserController {
       const token = generateJwt(req.user.id, req.user.login, req.user.role);
       return res.json({ token });
     } catch (error) {
-      console.error("Check token error:", error);
-      res.status(500).json({ message: "Check token error", error });
+      console.error("Ошибка получения токена:", error);
+      res.status(500).json({ message: "Нет токена", error });
     }
   }
 
@@ -82,7 +82,7 @@ class UserController {
       }
       res.json({ id: userInfo.id, login: userInfo.login, role: userInfo.role });
     } catch (error) {
-      console.error("Profile retrieval error:", error);
+      console.error("Ошибка получения пользователя", error);
       res.status(500).json({ message: "Произошла ошибка при получении информации о пользователе" });
     }
   }
@@ -92,7 +92,7 @@ class UserController {
       const users = await User.findAll(); 
       res.json(users);
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error("Ошибка при получении пользователей", error);
       res.status(500).json({ message: "Ошибка при получении пользователей" });
     }
   }

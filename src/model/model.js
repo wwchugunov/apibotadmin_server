@@ -8,13 +8,11 @@ const User = sequelize.define('User', {
   login: { type: DataTypes.STRING, allowNull: false },
   password: { type: DataTypes.STRING, allowNull: false },
   enrollment_date: { type: DataTypes.DATE, allowNull: false, defaultValue: Sequelize.NOW },
-  role: { 
-    type: DataTypes.ENUM('admin', 'user', 'moderator'),
-    allowNull: false, 
-    defaultValue: 'user'
+  role: { type: DataTypes.ENUM('admin', 'user', 'moderator'),allowNull: false, defaultValue: 'user'}
+  }, 
+  {
+    timestamps: true
   }
-}, 
-{timestamps: true}
 );
 
 
