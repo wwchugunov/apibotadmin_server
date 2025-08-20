@@ -1,7 +1,6 @@
 const db = require("../model/model");
 
 class UserbotController {
-
   
   async getAllUserbots(req, res) {
     try {
