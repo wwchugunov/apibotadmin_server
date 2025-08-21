@@ -30,25 +30,23 @@ app.use('/', router);
 
 // 404 handler
 app.use((req, res, next) => {
-    res.status(404).json({ error: 'Not found' });
+    res.status(404).json({ Error:'Неизвесная ошибка, Обратитесь к администратору сервера' });
 });
 
 app.use(ErrorHandlingMiddleware.handleError);
 
 const start = async () => {
     try {
-        console.log('Подключение к базе данных...');
         await sequelize.authenticate();
         await sequelize.sync();
-        console.log('База данных готова.');
 
         const server = http.createServer(app);
         server.listen(port, host || '0.0.0.0', () => {
-            console.log(`Server running on ${host || '0.0.0.0'}:${port}`);
+            console.log(`Сервер запущен ${host || '0.0.0.0'}:${port}`);
         });
 
         server.on('error', (err) => {
-            console.error('Server error:', err);
+            console.error('Ошибка', err);
             process.exit(1);
         });
     } catch (err) {
