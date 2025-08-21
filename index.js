@@ -1,53 +1,52 @@
 require('dotenv').config();
-const router = require('./src/router/index');
-const loger = require('morgan')
 const express = require('express');
-const sequelize = require('./src/config/db_config');
-const cors = require('cors');
 const http = require('http');
+const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
+const morgan = require('morgan');
+const rfs = require('rotating-file-stream');
+
+const router = require('./src/router/index');
+const sequelize = require('./src/config/db_config');
 const ErrorHandlingMiddleware = require('./src/middleware/ErrorHandlingMiddleware');
-const host = process.env.HOST
-const port = process.env.PORT || 5000;
-const fs = require('fs')
-const path = require('path')
+
 const app = express();
-
-const logger = fs.createWriteStream( path.join(__dirname, 'logger.log'),  { flags: 'a' } );
-app.use(loger('combined', { stream: logger }));
-
-app.use(cors());
+const host = process.env.HOST || '0.0.0.0';
+const port = process.env.PORT || 5000;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors({ origin: '*' }));
+
+const logDir = path.join(__dirname, 'logs');
+if (!fs.existsSync(logDir)) fs.mkdirSync(logDir);
+
+const accessLogStream = rfs.createStream('access.log', {
+    interval: '1d',
+    path: logDir,
+    compress: 'gzip'
+});
+
+morgan.token('body', (req) => JSON.stringify(req.body || {}));
+
+app.use(morgan('dev'));
+app.use(morgan(':method :url :status :response-time ms - :body', { stream: accessLogStream }));
 
 app.use('/', router);
-
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-    next();
-});
-
 app.use(ErrorHandlingMiddleware.handleError);
-
-app.use((req, res) => {
-    res.status(404).send("Not found");
-});
+app.use((req, res) => res.status(404).send("Not found"));
 
 const start = async () => {
     try {
         await sequelize.authenticate();
         await sequelize.sync();
-        const server = http.createServer(app);
-        server.listen(port, host, () => {
-            console.log(`Server running on port ${port}`);
+        http.createServer(app).listen(port, host, () => {
+            console.log(`Server running on ${host}:${port}`);
         });
-    } catch (error) {
-        console.log(`Error: ${error.message}`);
-
-
+    } catch (err) {
+        console.error(`Error: ${err.message}`);
     }
 };
 
 start();
-
