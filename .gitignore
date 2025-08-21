@@ -1,2 +1,4 @@
+access.log
 node_modules/
 .env
+logger.log
