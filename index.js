@@ -1,14 +1,20 @@
-const express = require('express');
 require('dotenv').config();
-const sequelize = require('./src/config/db_config');
 const router = require('./src/router/index');
+const loger = require('morgan')
+const express = require('express');
+const sequelize = require('./src/config/db_config');
 const cors = require('cors');
 const http = require('http');
 const ErrorHandlingMiddleware = require('./src/middleware/ErrorHandlingMiddleware');
 const host = process.env.HOST
 const port = process.env.PORT || 5000;
-// const telegrambot = require('./telegram');
+const fs = require('fs')
+const path = require('path')
 const app = express();
+
+const logger = fs.createWriteStream( path.join(__dirname, 'logger.log'),  { flags: 'a' } );
+app.use(loger('combined', { stream: logger }));
+
 app.use(cors());
 
 app.use(express.json());
@@ -44,3 +50,4 @@ const start = async () => {
 };
 
 start();
+
